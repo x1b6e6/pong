@@ -18,28 +18,28 @@ pub struct Player {
 pub type Score = (u32, u32);
 
 #[derive(Clone, Copy)]
-pub struct PongProgress {
+pub struct Progress {
     pub ball: Ball,
     pub player1: Player,
     pub player2: Player,
     pub score: Score,
 }
 
-pub trait PongDrawer {
+pub trait Drawer {
     fn draw_ball(&mut self, ball: Ball);
     fn draw_player(&mut self, player: Player);
     fn draw_score(&mut self, score: Score);
 }
 
 #[derive(Clone, Copy)]
-pub enum ResultPongStatus {
+pub enum Result {
     GameOver(Score),
-    GameInProgress(PongProgress),
+    GameInProgress(Progress),
     Err,
 }
 
 #[derive(Clone, Copy)]
-pub enum PongStatus {
+pub enum Status {
     GameOver,
     GameInProgress,
 }
@@ -50,8 +50,8 @@ where
 {
     width: u32,
     height: u32,
-    progress: PongProgress,
-    status: PongStatus,
+    progress: Progress,
+    status: Status,
     random: RND,
 }
 
@@ -63,8 +63,8 @@ where
         Self {
             width,
             height,
-            status: PongStatus::GameInProgress,
-            progress: PongProgress {
+            status: Status::GameInProgress,
+            progress: Progress {
                 ball: Ball::new(width, height),
                 player1: Player::player1(width, height),
                 player2: Player::player2(width, height),
@@ -75,16 +75,16 @@ where
     }
 
     pub fn reinit(&mut self) {
-        self.progress = PongProgress {
+        self.progress = Progress {
             ball: Ball::new(self.width, self.height),
             player1: Player::player1(self.width, self.height),
             player2: Player::player2(self.width, self.height),
             score: self.progress.score,
         };
-        self.status = PongStatus::GameInProgress;
+        self.status = Status::GameInProgress;
     }
 
-    fn move_ball(&mut self) -> ResultPongStatus {
+    fn move_ball(&mut self) -> Result {
         let ball = &mut self.progress.ball;
 
         ball.x += ball.x_spd;
@@ -97,14 +97,14 @@ where
 
         if ball.x < 0f32 {
             self.progress.score.1 += 1;
-            self.status = PongStatus::GameOver;
-            return ResultPongStatus::GameOver(self.progress.score);
+            self.status = Status::GameOver;
+            return Result::GameOver(self.progress.score);
         }
 
         if ball.x > self.width as f32 {
             self.progress.score.0 += 1;
-            self.status = PongStatus::GameOver;
-            return ResultPongStatus::GameOver(self.progress.score);
+            self.status = Status::GameOver;
+            return Result::GameOver(self.progress.score);
         }
 
         if ball.y - ball.r as f32 <= 0.0 {
@@ -112,7 +112,7 @@ where
         } else if ball.y + ball.r as f32 > self.height as f32 {
             ball.y_spd = -ball.y_spd;
         }
-        ResultPongStatus::GameInProgress(self.progress)
+        Result::GameInProgress(self.progress)
     }
 
     fn player1_move(&mut self, delta: i32) {
@@ -131,17 +131,17 @@ where
         }
     }
 
-    pub fn next(&mut self, delta1: i32, delta2: i32) -> ResultPongStatus {
-        if let PongStatus::GameInProgress = self.status {
+    pub fn next(&mut self, delta1: i32, delta2: i32) -> Result {
+        if let Status::GameInProgress = self.status {
             self.player1_move(delta1);
             self.player2_move(delta2);
             self.move_ball()
         } else {
-            ResultPongStatus::Err
+            Result::Err
         }
     }
 
-    pub fn status(&self) -> PongStatus {
+    pub fn status(&self) -> Status {
         self.status
     }
 }

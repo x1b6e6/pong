@@ -139,7 +139,7 @@ fn main() -> ! {
     loop {
         block!(timer.wait()).unwrap();
 
-        if let pong::PongStatus::GameOver = pong.status() {
+        if let pong::Status::GameOver = pong.status() {
             if player1.any() || player2.any() {
                 continue;
             }
@@ -153,8 +153,8 @@ fn main() -> ! {
         let res = pong.next(delta1, delta2);
 
         match res {
-            pong::ResultPongStatus::GameInProgress(progress) => {
-                use pong::PongDrawer;
+            pong::Result::GameInProgress(progress) => {
+                use pong::Drawer;
 
                 drawer.clear();
                 drawer.draw_score(progress.score);

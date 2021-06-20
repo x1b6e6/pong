@@ -63,7 +63,7 @@ where
     }
 }
 
-impl<SPI, DC, CS, SIZE> pong::PongDrawer for Ssd1306PongDrawer<SPI, DC, CS, SIZE>
+impl<SPI, DC, CS, SIZE> pong::Drawer for Ssd1306PongDrawer<SPI, DC, CS, SIZE>
 where
     SPI: spi::Write<u8>,
     DC: OutputPin,
