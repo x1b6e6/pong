@@ -108,7 +108,7 @@ fn main() -> ! {
 
     let mut rand_pin = gpioa.pa4.into_analog(&mut gpioa.crl);
     let mut adc = Adc::adc1(dp.ADC1, &mut rcc.apb2, clocks);
-    let rand_seed: u32 = adc.read(&mut rand_pin).unwrap();
+    let rand_seed: u16 = adc.read(&mut rand_pin).unwrap();
 
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
 
@@ -131,7 +131,7 @@ fn main() -> ! {
 
     let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(60.hz());
     let mut rand_generator = rnd::PseudoRandomGenerator::new(rand_seed);
-    let mut pong = pong::Pong::new(128, 64, || rand_generator.get::<u32>() as i32);
+    let mut pong = pong::Pong::new(128, 64, || rand_generator.get() as i32);
 
     let mut player1 = PlayerControl::new(btn_up1, btn_down1);
     let mut player2 = PlayerControl::new(btn_up2, btn_down2);
