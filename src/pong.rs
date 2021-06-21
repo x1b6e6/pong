@@ -63,17 +63,20 @@ where
 
         if ball.x < 0f32 {
             self.progress.score.1 += 1;
-            self.status = Status::GameOver;
-            return Result::GameOver;
+            return self.game_over();
         }
 
         if ball.x > self.width as f32 {
             self.progress.score.0 += 1;
-            self.status = Status::GameOver;
-            return Result::GameOver;
+            return self.game_over();
         }
 
         Result::GameInProgress(self.progress)
+    }
+
+    fn game_over(&mut self) -> Result {
+        self.status = Status::GameOver;
+        Result::GameOver
     }
 
     fn player1_move(&mut self, delta: i32) {
