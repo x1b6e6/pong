@@ -95,6 +95,10 @@ where
             ball.bounce_off_player(&mut self.random);
         }
 
+        if ball.border_collision(0, self.height) {
+            ball.bounce_off_border();
+        }
+
         if ball.x < 0f32 {
             self.progress.score.1 += 1;
             self.status = Status::GameOver;
@@ -105,12 +109,6 @@ where
             self.progress.score.0 += 1;
             self.status = Status::GameOver;
             return Result::GameOver(self.progress.score);
-        }
-
-        if ball.y - ball.r as f32 <= 0.0 {
-            ball.y_spd = -ball.y_spd;
-        } else if ball.y + ball.r as f32 > self.height as f32 {
-            ball.y_spd = -ball.y_spd;
         }
         Result::GameInProgress(self.progress)
     }
@@ -213,12 +211,22 @@ impl Ball {
         true
     }
 
+    fn border_collision(&self, top_border: u32, bottom_border: u32) -> bool {
+        let ball_top = self.y - self.r as f32;
+        let ball_bottom = self.y + self.r as f32;
+        ball_top < top_border as f32 || ball_bottom > bottom_border as f32
+    }
+
     fn bounce_off_player<RND>(&mut self, random: &mut RND)
     where
         RND: FnMut() -> i32,
     {
         self.x_spd = -self.x_spd;
         self.rand_add_y_spd(random);
+    }
+
+    fn bounce_off_border(&mut self) {
+        self.y_spd = -self.y_spd;
     }
 
     fn move_next(&mut self) {
