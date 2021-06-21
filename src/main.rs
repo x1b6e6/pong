@@ -157,10 +157,10 @@ fn main() -> ! {
                 use pong::Drawer;
 
                 drawer.clear();
-                drawer.draw_score(progress.score);
-                drawer.draw_ball(progress.ball);
-                drawer.draw_player(progress.player1);
-                drawer.draw_player(progress.player2);
+                drawer.draw_score(&progress.score);
+                drawer.draw_ball(&progress.ball);
+                drawer.draw_player(&progress.player1);
+                drawer.draw_player(&progress.player2);
                 drawer.flush();
             }
             _ => {

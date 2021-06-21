@@ -58,6 +58,7 @@ where
             .draw(&mut self.display)
             .unwrap();
     }
+
     pub fn flush(&mut self) {
         self.display.flush().unwrap();
     }
@@ -70,7 +71,7 @@ where
     CS: OutputPin,
     SIZE: DisplaySize,
 {
-    fn draw_ball(&mut self, ball: pong::Ball) {
+    fn draw_ball(&mut self, ball: &pong::Ball) {
         Circle::new(
             Point::new(ball.x as i32 - ball.r as i32, ball.y as i32 - ball.r as i32),
             ball.r * 2,
@@ -85,13 +86,14 @@ where
         .unwrap();
     }
 
-    fn draw_player(&mut self, player: pong::Player) {
+    fn draw_player(&mut self, player: &pong::Player) {
         self.draw_rect(
             Point::new(player.x, player.y),
             Size::new(player.width, player.height),
         )
     }
-    fn draw_score(&mut self, score: (u32, u32)) {
+
+    fn draw_score(&mut self, score: &pong::Score) {
         use numtoa::NumToA;
         let mut data1 = [0u8; 10];
         let mut data2 = [0u8; 10];
