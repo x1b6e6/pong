@@ -87,8 +87,7 @@ where
     fn move_ball(&mut self) -> Result {
         let ball = &mut self.progress.ball;
 
-        ball.x += ball.x_spd;
-        ball.y += ball.y_spd;
+        ball.move_next();
 
         if ball.player_collision(&self.progress.player1)
             || ball.player_collision(&self.progress.player2)
@@ -220,6 +219,11 @@ impl Ball {
     {
         self.x_spd = -self.x_spd;
         self.rand_add_y_spd(random);
+    }
+
+    fn move_next(&mut self) {
+        self.x += self.x_spd;
+        self.y += self.y_spd;
     }
 }
 
