@@ -83,7 +83,7 @@ where
         Result::GameOver(last_goal_from)
     }
 
-    fn player1_move(&mut self, delta: i32) {
+    fn move_player1(&mut self, delta: i32) {
         if delta > 0 {
             self.progress.player1.move_up(delta, 0);
         } else if delta < 0 {
@@ -91,7 +91,7 @@ where
         }
     }
 
-    fn player2_move(&mut self, delta: i32) {
+    fn move_player2(&mut self, delta: i32) {
         if delta > 0 {
             self.progress.player2.move_up(delta, 0);
         } else if delta < 0 {
@@ -101,8 +101,8 @@ where
 
     pub fn next(&mut self, delta1: i32, delta2: i32) -> Result {
         if let Status::GameInProgress = self.status {
-            self.player1_move(delta1);
-            self.player2_move(delta2);
+            self.move_player1(delta1);
+            self.move_player2(delta2);
             self.move_ball()
         } else {
             Result::Err

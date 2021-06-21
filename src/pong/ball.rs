@@ -41,7 +41,7 @@ impl Ball {
         Self::with_x_spd(width, height, ball_x_speed)
     }
 
-    fn rand_add_y_spd<RND>(&mut self, rand: &mut RND)
+    fn add_rand_y_spd<RND>(&mut self, rand: &mut RND)
     where
         RND: FnMut() -> i32,
     {
@@ -117,7 +117,7 @@ impl Ball {
         RND: FnMut() -> i32,
     {
         self.x_spd = -self.x_spd;
-        self.rand_add_y_spd(random);
+        self.add_rand_y_spd(random);
     }
 
     pub(super) fn bounce_off_border(&mut self) {
