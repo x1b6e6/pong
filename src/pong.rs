@@ -21,13 +21,13 @@ impl<RND> Pong<RND>
 where
     RND: FnMut() -> i32,
 {
-    pub fn new(width: u32, height: u32, random: RND) -> Self {
+    pub fn new(width: u32, height: u32, mut random: RND) -> Self {
         Self {
             width,
             height,
             status: Status::GameInProgress,
             progress: Progress {
-                ball: Ball::new(width, height),
+                ball: Ball::with_rand_x_spd(width, height, &mut random),
                 player1: Player::player1(width, height),
                 player2: Player::player2(width, height),
                 score: (0, 0),
@@ -38,7 +38,7 @@ where
 
     pub fn reinit(&mut self) {
         self.progress = Progress {
-            ball: Ball::new(self.width, self.height),
+            ball: Ball::with_rand_x_spd(self.width, self.height, &mut self.random),
             player1: Player::player1(self.width, self.height),
             player2: Player::player2(self.width, self.height),
             score: self.progress.score,

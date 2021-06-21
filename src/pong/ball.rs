@@ -10,14 +10,35 @@ pub struct Ball {
 }
 
 impl Ball {
-    pub(super) fn new(_width: u32, height: u32) -> Self {
+    fn new(_width: u32, height: u32) -> Self {
         Self {
             x: 5.0,
             y: height as f32 / 2.0,
             r: 3, // TODO: calculate from width and height
-            x_spd: BALL_MAX_SPEED,
+            x_spd: 0.0,
             y_spd: 0.0,
         }
+    }
+
+    pub(super) fn with_x_spd(width: u32, height: u32, x_spd: f32) -> Self {
+        let mut o = Self::new(width, height);
+        o.x_spd = x_spd;
+        o
+    }
+
+    pub(super) fn with_rand_x_spd<RND>(width: u32, height: u32, rand: &mut RND) -> Self
+    where
+        RND: FnMut() -> i32,
+    {
+        let rnd = rand();
+
+        let ball_x_speed = if rnd % 2 == 0 {
+            BALL_MAX_SPEED
+        } else {
+            -BALL_MAX_SPEED
+        };
+
+        Self::with_x_spd(width, height, ball_x_speed)
     }
 
     fn rand_add_y_spd<RND>(&mut self, rand: &mut RND)
