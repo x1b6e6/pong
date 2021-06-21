@@ -37,11 +37,19 @@ where
     }
 
     pub fn reinit(&mut self) {
+        let ball = match self.status {
+            Status::GameOver(last_goal_from) => match last_goal_from {
+                LastGoalFrom::Player1 => Ball::with_x_spd(self.width, self.height, -BALL_MAX_SPEED),
+                LastGoalFrom::Player2 => Ball::with_x_spd(self.width, self.height, BALL_MAX_SPEED),
+            },
+            _ => Ball::with_rand_x_spd(self.width, self.height, &mut self.random),
+        };
+
         self.progress = Progress {
-            ball: Ball::with_rand_x_spd(self.width, self.height, &mut self.random),
+            ball,
             player1: Player::player1(self.width, self.height),
             player2: Player::player2(self.width, self.height),
-            score: self.progress.score,
+            score: (0, 0),
         };
         self.status = Status::GameInProgress;
     }
@@ -63,19 +71,19 @@ where
 
         if ball.x < 0f32 {
             self.progress.score.1 += 1;
-            return self.game_over();
+            return self.game_over(LastGoalFrom::Player2);
         }
 
         if ball.x > self.width as f32 {
             self.progress.score.0 += 1;
-            return self.game_over();
+            return self.game_over(LastGoalFrom::Player1);
         }
 
         Result::GameInProgress(self.progress)
     }
 
-    fn game_over(&mut self) -> Result {
-        self.status = Status::GameOver;
+    fn game_over(&mut self, last_goal_from: LastGoalFrom) -> Result {
+        self.status = Status::GameOver(last_goal_from);
         Result::GameOver
     }
 

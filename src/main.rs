@@ -139,7 +139,7 @@ fn main() -> ! {
     loop {
         block!(timer.wait()).unwrap();
 
-        if let pong::Status::GameOver = pong.status() {
+        if let pong::Status::GameOver(_) = pong.status() {
             if player1.any() || player2.any() {
                 continue;
             }

@@ -25,6 +25,12 @@ pub enum Result {
 
 #[derive(Clone, Copy)]
 pub enum Status {
-    GameOver,
+    GameOver(LastGoalFrom),
     GameInProgress,
+}
+
+#[derive(Clone, Copy)]
+pub enum LastGoalFrom {
+    Player1,
+    Player2,
 }

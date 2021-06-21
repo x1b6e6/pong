@@ -10,9 +10,9 @@ pub struct Ball {
 }
 
 impl Ball {
-    fn new(_width: u32, height: u32) -> Self {
+    fn new(width: u32, height: u32) -> Self {
         Self {
-            x: 5.0,
+            x: width as f32 / 2.0,
             y: height as f32 / 2.0,
             r: 3, // TODO: calculate from width and height
             x_spd: 0.0,
