@@ -30,7 +30,6 @@ where
                 ball: Ball::with_rand_x_spd(width, height, &mut random),
                 player1: Player::player1(width, height),
                 player2: Player::player2(width, height),
-                score: (0, 0),
             },
             random,
         }
@@ -49,7 +48,6 @@ where
             ball,
             player1: Player::player1(self.width, self.height),
             player2: Player::player2(self.width, self.height),
-            score: (0, 0),
         };
         self.status = Status::GameInProgress;
     }
@@ -70,12 +68,10 @@ where
         }
 
         if ball.x < 0f32 {
-            self.progress.score.1 += 1;
             return self.game_over(LastGoalFrom::Player2);
         }
 
         if ball.x > self.width as f32 {
-            self.progress.score.0 += 1;
             return self.game_over(LastGoalFrom::Player1);
         }
 
@@ -84,7 +80,7 @@ where
 
     fn game_over(&mut self, last_goal_from: LastGoalFrom) -> Result {
         self.status = Status::GameOver(last_goal_from);
-        Result::GameOver
+        Result::GameOver(last_goal_from)
     }
 
     fn player1_move(&mut self, delta: i32) {

@@ -136,6 +136,8 @@ fn main() -> ! {
     let mut player1 = PlayerControl::new(btn_up1, btn_down1);
     let mut player2 = PlayerControl::new(btn_up2, btn_down2);
 
+    let mut score = (0, 0);
+
     loop {
         block!(timer.wait()).unwrap();
 
@@ -157,11 +159,18 @@ fn main() -> ! {
                 use pong::Drawer;
 
                 drawer.clear();
-                drawer.draw_score(&progress.score);
+                drawer.draw_score(&score);
                 drawer.draw_ball(&progress.ball);
                 drawer.draw_player(&progress.player1);
                 drawer.draw_player(&progress.player2);
                 drawer.flush();
+            }
+            pong::Result::GameOver(last_goal_from) => {
+                match last_goal_from {
+                    pong::LastGoalFrom::Player1 => score.0 += 1,
+                    pong::LastGoalFrom::Player2 => score.1 += 1,
+                };
+                wait_press(&player1, &player2, &mut timer, &mut led);
             }
             _ => {
                 wait_press(&player1, &player2, &mut timer, &mut led);

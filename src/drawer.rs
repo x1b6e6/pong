@@ -59,41 +59,7 @@ where
             .unwrap();
     }
 
-    pub fn flush(&mut self) {
-        self.display.flush().unwrap();
-    }
-}
-
-impl<SPI, DC, CS, SIZE> pong::Drawer for Ssd1306PongDrawer<SPI, DC, CS, SIZE>
-where
-    SPI: spi::Write<u8>,
-    DC: OutputPin,
-    CS: OutputPin,
-    SIZE: DisplaySize,
-{
-    fn draw_ball(&mut self, ball: &pong::Ball) {
-        Circle::new(
-            Point::new(ball.x as i32 - ball.r as i32, ball.y as i32 - ball.r as i32),
-            ball.r * 2,
-        )
-        .into_styled(
-            PrimitiveStyleBuilder::new()
-                .fill_color(BinaryColor::On)
-                .stroke_color(BinaryColor::On)
-                .build(),
-        )
-        .draw(&mut self.display)
-        .unwrap();
-    }
-
-    fn draw_player(&mut self, player: &pong::Player) {
-        self.draw_rect(
-            Point::new(player.x, player.y),
-            Size::new(player.width, player.height),
-        )
-    }
-
-    fn draw_score(&mut self, score: &pong::Score) {
+    pub fn draw_score(&mut self, score: &(u32, u32)) {
         use numtoa::NumToA;
         let mut data1 = [0u8; 10];
         let mut data2 = [0u8; 10];
@@ -127,5 +93,39 @@ where
         Text::new(text2, Point::new(66, 11), style)
             .draw(&mut self.display)
             .unwrap();
+    }
+
+    pub fn flush(&mut self) {
+        self.display.flush().unwrap();
+    }
+}
+
+impl<SPI, DC, CS, SIZE> pong::Drawer for Ssd1306PongDrawer<SPI, DC, CS, SIZE>
+where
+    SPI: spi::Write<u8>,
+    DC: OutputPin,
+    CS: OutputPin,
+    SIZE: DisplaySize,
+{
+    fn draw_ball(&mut self, ball: &pong::Ball) {
+        Circle::new(
+            Point::new(ball.x as i32 - ball.r as i32, ball.y as i32 - ball.r as i32),
+            ball.r * 2,
+        )
+        .into_styled(
+            PrimitiveStyleBuilder::new()
+                .fill_color(BinaryColor::On)
+                .stroke_color(BinaryColor::On)
+                .build(),
+        )
+        .draw(&mut self.display)
+        .unwrap();
+    }
+
+    fn draw_player(&mut self, player: &pong::Player) {
+        self.draw_rect(
+            Point::new(player.x, player.y),
+            Size::new(player.width, player.height),
+        )
     }
 }
