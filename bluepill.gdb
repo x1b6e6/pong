@@ -4,4 +4,4 @@ monitor flash probe 0
 monitor flash protect 0 0 last off
 load
 monitor flash protect 0 0 last on
-monitor reset halt
+monitor reset
