@@ -90,10 +90,11 @@ where
         ball.x += ball.x_spd;
         ball.y += ball.y_spd;
 
-        let player1 = &self.progress.player1;
-        ball.check_player1_collision(player1, &mut self.random);
-        let player2 = &self.progress.player2;
-        ball.check_player2_collision(player2, &mut self.random);
+        if ball.player_collision(&self.progress.player1)
+            || ball.player_collision(&self.progress.player2)
+        {
+            ball.bounce_off_player(&mut self.random);
+        }
 
         if ball.x < 0f32 {
             self.progress.score.1 += 1;
@@ -181,56 +182,47 @@ impl Ball {
         }
     }
 
-    fn check_player1_collision<RND>(&mut self, player: &Player, random: &mut RND) -> bool
-    where
-        RND: FnMut() -> i32,
-    {
-        if self.x_spd > 0.0 {
-            return false;
-        }
+    fn player_collision(&self, player: &Player) -> bool {
+        {
+            let ball_top = self.y - self.r as f32;
+            let ball_bottom = self.y + self.r as f32;
+            let player_top = player.y as f32;
+            let player_bottom = (player.y + player.height as i32) as f32;
 
-        if (self.x - self.r as f32) > (player.x + player.width as i32) as f32 {
-            return false;
-        }
+            if ball_top > player_bottom {
+                return false;
+            }
 
-        if (self.y - self.r as f32) > (player.y + player.height as i32) as f32 {
-            return false;
+            if ball_bottom < player_top {
+                return false;
+            }
         }
+        {
+            let ball_left = self.x - self.r as f32;
+            let ball_right = self.x + self.r as f32;
+            let player_left = player.x as f32;
+            let player_right = (player.x + player.width as i32) as f32;
 
-        if (self.y + self.r as f32) < player.y as f32 {
-            return false;
+            if ball_left > player_right {
+                return false;
+            }
+
+            if ball_right < player_left {
+                return false;
+            }
         }
-
-        self.x_spd = -self.x_spd;
-        self.rand_add_y_spd(random);
         true
     }
 
-    fn check_player2_collision<RND>(&mut self, player: &Player, random: &mut RND) -> bool
+    fn bounce_off_player<RND>(&mut self, random: &mut RND)
     where
         RND: FnMut() -> i32,
     {
-        if self.x_spd < 0.0 {
-            return false;
-        }
-
-        if (self.x + self.r as f32) < player.x as f32 {
-            return false;
-        }
-
-        if self.y > (player.y + player.height as i32) as f32 {
-            return false;
-        }
-
-        if self.y < player.y as f32 {
-            return false;
-        }
-
         self.x_spd = -self.x_spd;
         self.rand_add_y_spd(random);
-        true
     }
 }
+
 impl Player {
     fn player1(_width: u32, height: u32) -> Self {
         Self {
