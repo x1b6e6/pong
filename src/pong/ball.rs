@@ -56,12 +56,21 @@ impl Ball {
     }
 
     fn limit_speed(&mut self) {
-        let limit = BALL_MAX_SPEED;
+        let y_limit = BALL_MAX_SPEED / 2.0;
 
-        if self.y_spd > limit {
-            self.y_spd -= self.y_spd - limit;
-        } else if self.y_spd < -limit {
-            self.y_spd -= self.y_spd + limit;
+        if self.y_spd > y_limit {
+            self.y_spd -= self.y_spd - y_limit;
+        } else if self.y_spd < -y_limit {
+            self.y_spd -= self.y_spd + y_limit;
+        }
+
+        use micromath::F32Ext;
+
+        let x_spd = (BALL_MAX_SPEED * BALL_MAX_SPEED - self.y_spd * self.y_spd).sqrt();
+        if self.x_spd > 0.0 {
+            self.x_spd = x_spd;
+        } else {
+            self.x_spd = -x_spd;
         }
     }
 

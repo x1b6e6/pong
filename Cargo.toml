@@ -15,6 +15,7 @@ embedded-graphics = "0.7.1"
 embedded-dma = "0.1.2"
 display-interface = "0.4.1"
 numtoa = "0.2.4"
+micromath = "2.0.0"
 
 [dependencies.ssd1306]
 git = "https://github.com/jamwaffles/ssd1306"
