@@ -164,12 +164,28 @@ fn main() -> ! {
                 drawer.flush();
             }
             _ => {
-                led.set_low().unwrap();
-                while !player1.any() && !player2.any() {
-                    block!(timer.wait()).unwrap();
-                }
+                wait_press(&player1, &player2, &mut timer, &mut led);
             }
         };
+    }
+}
+
+fn wait_press<BtnUp1, BtnDown1, BtnUp2, BtnDown2, TIMER, LED>(
+    player1: &PlayerControl<BtnUp1, BtnDown1>,
+    player2: &PlayerControl<BtnUp2, BtnDown2>,
+    timer: &mut TIMER,
+    led: &mut LED,
+) where
+    BtnUp1: InputPin,
+    BtnDown1: InputPin,
+    BtnUp2: InputPin,
+    BtnDown2: InputPin,
+    TIMER: embedded_hal::timer::CountDown,
+    LED: OutputPin,
+{
+    led.set_low().ok().unwrap();
+    while !player1.any() && !player2.any() {
+        block!(timer.wait()).unwrap();
     }
 }
 
