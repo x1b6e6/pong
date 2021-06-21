@@ -4,6 +4,8 @@ pub mod prelude;
 
 pub use prelude::*;
 
+const BALL_MAX_SPEED: f32 = 1.5;
+
 pub struct Pong<RND>
 where
     RND: FnMut() -> i32,

@@ -1,4 +1,4 @@
-use super::Player;
+use super::{Player, BALL_MAX_SPEED};
 
 #[derive(Clone, Copy)]
 pub struct Ball {
@@ -15,7 +15,7 @@ impl Ball {
             x: 5.0,
             y: height as f32 / 2.0,
             r: 3, // TODO: calculate from width and height
-            x_spd: 1.5,
+            x_spd: BALL_MAX_SPEED,
             y_spd: 0.0,
         }
     }
@@ -35,7 +35,7 @@ impl Ball {
     }
 
     fn limit_speed(&mut self) {
-        let limit = 1.5;
+        let limit = BALL_MAX_SPEED;
 
         if self.y_spd > limit {
             self.y_spd -= self.y_spd - limit;
