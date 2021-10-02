@@ -1,6 +1,12 @@
 #![no_std]
 #![no_main]
 
+#[cfg(any(
+    not(any(feature = "stm32f103", feature = "stm32f401")),
+    all(feature = "st32f103", feature = "stm32f401"),
+))]
+compile_error!("select only one of platforms: stm32f103, stm32f401");
+
 use {
     control::{PlayerControl, PlayerEncoder},
     cortex_m_rt::{entry, exception, ExceptionFrame},
