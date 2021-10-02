@@ -10,7 +10,10 @@ compile_error!("select only one of platforms: stm32f103, stm32f401");
 use {
     control::{PlayerControl, PlayerEncoder},
     cortex_m_rt::{entry, exception, ExceptionFrame},
-    embedded_hal::{digital::v2::OutputPin, timer::CountDown},
+    embedded_hal::{
+        digital::v2::{InputPin, OutputPin},
+        timer::CountDown,
+    },
     nb::block,
     panic_halt as _,
     ssd1306::{prelude::SPIInterface, size::DisplaySize128x64},
@@ -27,6 +30,7 @@ mod stm32;
 fn main() -> ! {
     let stm32::Device {
         spi,
+        key,
         mut led,
         dc,
         cs,
@@ -75,31 +79,34 @@ fn main() -> ! {
                     pong::LastGoalFrom::Player1 => score.0 += 1,
                     pong::LastGoalFrom::Player2 => score.1 += 1,
                 };
-                wait_press(&mut player1, &mut player2, &mut timer, &mut led);
+                wait_press(&mut player1, &mut player2, &key, &mut timer, &mut led);
                 pong.reinit();
             }
             _ => {
-                wait_press(&mut player1, &mut player2, &mut timer, &mut led);
+                wait_press(&mut player1, &mut player2, &key, &mut timer, &mut led);
                 pong.reinit();
             }
         };
     }
 }
 
-fn wait_press<Player1, Player2, Timer, Led>(
+fn wait_press<Player1, Player2, Key, Timer, Led>(
     player1: &mut Player1,
     player2: &mut Player2,
+    key: &Key,
     timer: &mut Timer,
     led: &mut Led,
 ) where
     Player1: PlayerControl,
     Player2: PlayerControl,
+    Key: InputPin,
     Timer: CountDown,
     Led: OutputPin,
+    Key::Error: core::fmt::Debug,
     Led::Error: core::fmt::Debug,
 {
     led.set_low().unwrap();
-    control::wait_press(player1, player2, timer);
+    control::wait_press(player1, player2, key, timer);
     led.set_high().unwrap();
 }
 

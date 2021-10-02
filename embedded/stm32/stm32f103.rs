@@ -7,8 +7,9 @@ use {
         delay::Delay,
         gpio::{
             gpioa::{PA0, PA1, PA2, PA3, PA5, PA7, PA8, PA9},
+            gpiob::PB5,
             gpioc::PC13,
-            Alternate, Floating, Input, Output, PushPull,
+            Alternate, Floating, Input, Output, PullUp, PushPull,
         },
         pac::{self, SPI1, TIM1, TIM2},
         prelude::*,
@@ -26,6 +27,7 @@ pub struct Device {
     pub encoder1: qei::Qei<TIM1, Tim1NoRemap, (PA8<Input<Floating>>, PA9<Input<Floating>>)>,
     pub encoder2: qei::Qei<TIM2, Tim2NoRemap, (PA0<Input<Floating>>, PA1<Input<Floating>>)>,
     pub rand_seed: u16,
+    pub key: PB5<Input<PullUp>>,
     pub led: PC13<Output<PushPull>>,
     pub dc: PA3<Output<PushPull>>,
     pub cs: PA2<Output<PushPull>>,
@@ -50,6 +52,7 @@ impl Device {
             .freeze(&mut flash.acr);
 
         let mut gpioa = dp.GPIOA.split(&mut rcc.apb2);
+        let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
         let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
 
         let dc = gpioa.pa3.into_push_pull_output(&mut gpioa.crl);
@@ -73,6 +76,7 @@ impl Device {
         let mut adc = Adc::adc1(dp.ADC1, &mut rcc.apb2, clocks);
         let rand_seed: u16 = adc.read(&mut rand_pin).unwrap();
 
+        let key = gpiob.pb5.into_pull_up_input(&mut gpiob.crl);
         let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
 
         let encoder1 = Timer::tim1(dp.TIM1, &clocks, &mut rcc.apb2).qei::<Tim1NoRemap, _>(
@@ -93,6 +97,7 @@ impl Device {
             encoder1,
             encoder2,
             rand_seed,
+            key,
             led,
             dc,
             cs,

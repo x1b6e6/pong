@@ -5,7 +5,7 @@ use {
     stm32f4xx_hal::{
         adc::Adc,
         delay::Delay,
-        gpio::{Alternate, Floating, Input, NoPin, Output, Pin, PushPull},
+        gpio::{Alternate, Floating, Input, NoPin, Output, Pin, PullUp, PushPull},
         pac::{self, SPI1, TIM1, TIM4},
         prelude::*,
         qei,
@@ -29,6 +29,7 @@ pub struct Device {
     pub encoder1: qei::Qei<TIM1, (Pin<Alternate<1>, 'A', 8>, Pin<Alternate<1>, 'A', 9>)>,
     pub encoder2: qei::Qei<TIM4, (Pin<Alternate<2>, 'B', 6>, Pin<Alternate<2>, 'B', 7>)>,
     pub rand_seed: u16,
+    pub key: Pin<Input<PullUp>, 'A', 0>,
     pub led: Pin<Output<PushPull>, 'C', 13>,
     pub dc: Pin<Output<PushPull>, 'A', 3>,
     pub cs: Pin<Output<PushPull>, 'A', 2>,
@@ -73,6 +74,7 @@ impl Device {
             (gpiob.pb6.into_alternate(), gpiob.pb7.into_alternate()),
         );
 
+        let key = gpioa.pa0.into_pull_up_input();
         let led = gpioc.pc13.into_push_pull_output();
 
         let syst = Timer::syst(cp.SYST, &clocks);
@@ -86,6 +88,7 @@ impl Device {
             encoder1,
             encoder2,
             rand_seed,
+            key,
             led,
             dc,
             cs,

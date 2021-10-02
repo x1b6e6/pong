@@ -1,5 +1,5 @@
 use {
-    embedded_hal::{timer::CountDown, Qei},
+    embedded_hal::{digital::v2::InputPin, timer::CountDown, Qei},
     nb::block,
 };
 
@@ -43,19 +43,22 @@ where
     }
 }
 
-pub fn wait_press<Player1, Player2, Timer>(
+pub fn wait_press<Player1, Player2, Key, Timer>(
     player1: &mut Player1,
     player2: &mut Player2,
+    key: &Key,
     timer: &mut Timer,
 ) where
     Player1: PlayerControl,
     Player2: PlayerControl,
+    Key: InputPin,
+    Key::Error: core::fmt::Debug,
     Timer: CountDown,
 {
-    while !player1.any() && !player2.any() {
+    while !player1.any() && !player2.any() && key.is_high().unwrap() {
         block!(timer.wait()).unwrap();
     }
-    while player1.any() || player2.any() {
+    while player1.any() || player2.any() || key.is_low().unwrap() {
         block!(timer.wait()).unwrap();
     }
 }
