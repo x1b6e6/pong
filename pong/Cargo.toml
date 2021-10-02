@@ -1,0 +1,12 @@
+[package]
+name = "pong"
+version = "0.1.0"
+authors = ["x1b6e6 <ftdabcde@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "pong"
+path = "lib.rs"
+
+[dependencies]
+micromath = "2.0.0"

@@ -1,6 +1,6 @@
 use super::{Player, BALL_MAX_SPEED};
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ball {
     pub x: f32,
     pub y: f32,
@@ -20,13 +20,13 @@ impl Ball {
         }
     }
 
-    pub(super) fn with_x_spd(width: u32, height: u32, x_spd: f32) -> Self {
+    pub(crate) fn with_x_spd(width: u32, height: u32, x_spd: f32) -> Self {
         let mut o = Self::new(width, height);
         o.x_spd = x_spd;
         o
     }
 
-    pub(super) fn with_rand_x_spd<RND>(width: u32, height: u32, rand: &mut RND) -> Self
+    pub(crate) fn with_rand_x_spd<RND>(width: u32, height: u32, rand: &mut RND) -> Self
     where
         RND: FnMut() -> i32,
     {
@@ -41,7 +41,7 @@ impl Ball {
         Self::with_x_spd(width, height, ball_x_speed)
     }
 
-    fn add_rand_y_spd<RND>(&mut self, rand: &mut RND)
+    pub(crate) fn add_rand_y_spd<RND>(&mut self, rand: &mut RND)
     where
         RND: FnMut() -> i32,
     {
@@ -56,7 +56,7 @@ impl Ball {
     }
 
     fn limit_speed(&mut self) {
-        let y_limit = BALL_MAX_SPEED / 2.0;
+        let y_limit = BALL_MAX_SPEED / 2.5;
 
         if self.y_spd > y_limit {
             self.y_spd -= self.y_spd - y_limit;
@@ -64,6 +64,7 @@ impl Ball {
             self.y_spd -= self.y_spd + y_limit;
         }
 
+        #[cfg(not(any(test, bench)))]
         use micromath::F32Ext;
 
         let x_spd = (BALL_MAX_SPEED * BALL_MAX_SPEED - self.y_spd * self.y_spd).sqrt();
@@ -74,7 +75,7 @@ impl Ball {
         }
     }
 
-    pub(super) fn player_collision(&self, player: &Player) -> bool {
+    pub(crate) fn player_collision(&self, player: &Player) -> bool {
         {
             let ball_top = self.y - self.r as f32;
             let ball_bottom = self.y + self.r as f32;
@@ -106,13 +107,18 @@ impl Ball {
         true
     }
 
-    pub(super) fn border_collision(&self, top_border: u32, bottom_border: u32) -> bool {
+    pub(crate) fn border_collision(&self, top_border: u32, bottom_border: u32) -> bool {
         let ball_top = self.y - self.r as f32;
         let ball_bottom = self.y + self.r as f32;
-        ball_top < top_border as f32 || ball_bottom > bottom_border as f32
+
+        if self.y_spd > 0.0 {
+            ball_bottom >= bottom_border as f32
+        } else {
+            ball_top <= top_border as f32
+        }
     }
 
-    pub(super) fn bounce_off_player<RND>(&mut self, random: &mut RND)
+    pub(crate) fn bounce_off_player<RND>(&mut self, random: &mut RND)
     where
         RND: FnMut() -> i32,
     {
@@ -120,11 +126,11 @@ impl Ball {
         self.add_rand_y_spd(random);
     }
 
-    pub(super) fn bounce_off_border(&mut self) {
+    pub(crate) fn bounce_off_border(&mut self) {
         self.y_spd = -self.y_spd;
     }
 
-    pub(super) fn move_next(&mut self) {
+    pub(crate) fn move_next(&mut self) {
         self.x += self.x_spd;
         self.y += self.y_spd;
     }

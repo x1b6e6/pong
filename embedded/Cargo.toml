@@ -1,0 +1,53 @@
+[package]
+name = "embedded-pong"
+version = "0.1.0"
+authors = ["x1b6e6 <ftdabcde@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+cortex-m = "*"
+cortex-m-rt = "*"
+cortex-m-semihosting = "*"
+panic-halt = "*"
+nb = "1.0.0"
+embedded-hal = "0.2.6"
+embedded-graphics = "0.7.1"
+embedded-dma = "0.1.2"
+display-interface = "0.4.1"
+numtoa = "0.2.4"
+micromath = "2.0.0"
+
+[dependencies.pong]
+path = "../pong"
+
+[dependencies.ssd1306]
+version = "0.7.0"
+
+[dependencies.stm32f1xx-hal]
+version = "0.7.0"
+features = [ "stm32f103", "rt" ]
+optional = true
+
+[dependencies.stm32f4xx-hal]
+version = "0.10.0"
+features = [ "stm32f401", "rt" ]
+optional = true
+
+[[bin]]
+name = "embedded"
+path = "main.rs"
+test = false
+bench = false
+
+[features]
+default = []
+
+stm32f103 = [
+    "stm32f1xx-hal/stm32f103",
+    "stm32f1xx-hal/rt",
+]
+
+stm32f401 = [
+    "stm32f4xx-hal/stm32f401",
+    "stm32f4xx-hal/rt",
+]

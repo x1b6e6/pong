@@ -1,10 +1,15 @@
+#![cfg_attr(not(any(test, bench)), no_std)]
+
 pub mod ball;
 pub mod player;
 pub mod prelude;
 
+#[cfg(test)]
+mod test;
+
 pub use prelude::*;
 
-const BALL_MAX_SPEED: f32 = 1.5;
+const BALL_MAX_SPEED: f32 = 1.8;
 
 pub struct Pong<RND>
 where

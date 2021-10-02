@@ -1,36 +1,32 @@
-use crate::pong;
-use embedded_graphics::{
-    mono_font::{ascii::FONT_8X13, MonoTextStyleBuilder},
-    pixelcolor::BinaryColor,
-    prelude::*,
-    primitives::{Circle, PrimitiveStyleBuilder, Rectangle},
-    text::Text,
+use {
+    display_interface::WriteOnlyDataCommand,
+    embedded_graphics::{
+        mono_font::{ascii::FONT_8X13, MonoTextStyleBuilder},
+        pixelcolor::BinaryColor,
+        prelude::*,
+        primitives::{Circle, PrimitiveStyleBuilder, Rectangle},
+        text::Text,
+    },
+    ssd1306::{mode::BufferedGraphicsMode, prelude::*, Ssd1306},
 };
-use embedded_hal::{blocking::spi, digital::v2::OutputPin};
-use ssd1306::{mode::BufferedGraphicsMode, prelude::*, Ssd1306};
 
-pub struct Ssd1306PongDrawer<SPI, DC, CS, SIZE>
+pub struct Ssd1306PongDrawer<DisplayInterface, FieldSize>
 where
-    SPI: spi::Write<u8>,
-    DC: OutputPin,
-    CS: OutputPin,
-    SIZE: DisplaySize,
+    DisplayInterface: WriteOnlyDataCommand,
+    FieldSize: DisplaySize,
 {
-    display: Ssd1306<SPIInterface<SPI, DC, CS>, SIZE, BufferedGraphicsMode<SIZE>>,
+    display: Ssd1306<DisplayInterface, FieldSize, BufferedGraphicsMode<FieldSize>>,
 }
 
-impl<SPI, DC, CS, SIZE> Ssd1306PongDrawer<SPI, DC, CS, SIZE>
+impl<DisplayInterface, FieldSize> Ssd1306PongDrawer<DisplayInterface, FieldSize>
 where
-    SPI: spi::Write<u8>,
-    DC: OutputPin,
-    CS: OutputPin,
-    SIZE: DisplaySize,
+    DisplayInterface: WriteOnlyDataCommand,
+    FieldSize: DisplaySize,
 {
-    pub fn new(spi: SPI, dc: DC, cs: CS, size: SIZE) -> Self {
-        let interface = SPIInterface::new(spi, dc, cs);
+    pub fn new(interface: DisplayInterface, size: FieldSize) -> Self {
         let mut display =
             Ssd1306::new(interface, size, DisplayRotation::Rotate0).into_buffered_graphics_mode();
-        display.init().unwrap();
+        display.init().ok().unwrap();
 
         Self { display }
     }
@@ -100,12 +96,10 @@ where
     }
 }
 
-impl<SPI, DC, CS, SIZE> pong::Drawer for Ssd1306PongDrawer<SPI, DC, CS, SIZE>
+impl<DisplayInterface, FieldSize> pong::Drawer for Ssd1306PongDrawer<DisplayInterface, FieldSize>
 where
-    SPI: spi::Write<u8>,
-    DC: OutputPin,
-    CS: OutputPin,
-    SIZE: DisplaySize,
+    DisplayInterface: WriteOnlyDataCommand,
+    FieldSize: DisplaySize,
 {
     fn draw_ball(&mut self, ball: &pong::Ball) {
         Circle::new(

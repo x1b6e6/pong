@@ -37,18 +37,24 @@ impl BlinkTimer {
     }
 }
 
-use embedded_hal::digital::v2::OutputPin;
-use embedded_hal::prelude::*;
-use stm32f1xx_hal::delay::Delay;
+use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
-pub struct Blink<OP: OutputPin> {
+pub struct Blink<LED, DELAY>
+where
+    LED: OutputPin,
+    DELAY: DelayMs<u32>,
+{
     timer: BlinkTimer,
-    led: OP,
-    delay: Delay,
+    led: LED,
+    delay: DELAY,
 }
 
-impl<OP: OutputPin> Blink<OP> {
-    pub fn new(start: u32, led: OP, delay: Delay) -> Self {
+impl<LED, DELAY> Blink<LED, DELAY>
+where
+    LED: OutputPin,
+    DELAY: DelayMs<u32>,
+{
+    pub fn new(start: u32, led: LED, delay: DELAY) -> Self {
         Self {
             timer: BlinkTimer::new(start),
             led,
@@ -56,7 +62,7 @@ impl<OP: OutputPin> Blink<OP> {
         }
     }
 
-    pub fn next(&mut self) -> Result<(), OP::Error> {
+    pub fn next(&mut self) -> Result<(), LED::Error> {
         self.led.set_high()?;
         self.delay.delay_ms(self.timer.up());
         self.led.set_low()?;
