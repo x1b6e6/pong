@@ -4,12 +4,13 @@ use {
     embedded_hal::spi::MODE_0,
     stm32f1xx_hal::{
         adc::Adc,
+        delay::Delay,
         gpio::{
             gpioa::{PA0, PA1, PA2, PA3, PA5, PA7, PA8, PA9},
             gpioc::PC13,
             Alternate, Floating, Input, Output, PushPull,
         },
-        pac::{SPI1, TIM1, TIM2},
+        pac::{self, SPI1, TIM1, TIM2},
         prelude::*,
         qei,
         spi::{NoMiso, Spi, Spi1NoRemap},
@@ -17,7 +18,7 @@ use {
     },
 };
 
-pub use stm32f1xx_hal::{delay::Delay, pac, prelude};
+pub use stm32f1xx_hal::prelude;
 
 pub struct Device {
     pub spi:

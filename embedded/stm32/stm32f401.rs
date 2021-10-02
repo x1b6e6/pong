@@ -4,8 +4,9 @@ use {
     embedded_hal::spi::MODE_0,
     stm32f4xx_hal::{
         adc::Adc,
+        delay::Delay,
         gpio::{Alternate, Floating, Input, NoPin, Output, Pin, PushPull},
-        pac::{SPI1, TIM1, TIM4},
+        pac::{self, SPI1, TIM1, TIM4},
         prelude::*,
         qei,
         spi::{Spi, TransferModeNormal},
@@ -13,7 +14,7 @@ use {
     },
 };
 
-pub use stm32f4xx_hal::{delay::Delay, pac, prelude};
+pub use stm32f4xx_hal::prelude;
 
 pub struct Device {
     pub spi: Spi<
