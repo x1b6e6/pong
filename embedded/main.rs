@@ -25,21 +25,29 @@ mod stm32;
 
 #[entry]
 fn main() -> ! {
-    let device = stm32::Device::new();
+    let stm32::Device {
+        spi,
+        mut led,
+        dc,
+        cs,
+        rand_seed,
+        encoder1,
+        encoder2,
+        syst,
+    } = stm32::Device::new();
 
-    let mut led = device.led;
     OutputPin::set_high(&mut led).unwrap();
 
-    let interface = SPIInterface::new(device.spi, device.dc, device.cs);
+    let interface = SPIInterface::new(spi, dc, cs);
 
     let mut drawer = drawer::Ssd1306PongDrawer::new(interface, DisplaySize128x64);
 
-    let mut timer = device.syst.start_count_down(60.hz());
-    let mut rand_generator = rnd::PseudoRandomGenerator::new(device.rand_seed);
+    let mut timer = syst.start_count_down(60.hz());
+    let mut rand_generator = rnd::PseudoRandomGenerator::new(rand_seed);
     let mut pong = pong::Pong::new(128, 64, || rand_generator.get() as i32);
 
-    let mut player1 = PlayerEncoder::new(device.encoder1);
-    let mut player2 = PlayerEncoder::new(device.encoder2);
+    let mut player1 = PlayerEncoder::new(encoder1);
+    let mut player2 = PlayerEncoder::new(encoder2);
 
     let mut score = (0, 0);
 
@@ -88,10 +96,11 @@ fn wait_press<Player1, Player2, Timer, Led>(
     Player2: PlayerControl,
     Timer: CountDown,
     Led: OutputPin,
+    Led::Error: core::fmt::Debug,
 {
-    led.set_low().ok();
+    led.set_low().unwrap();
     control::wait_press(player1, player2, timer);
-    led.set_high().ok();
+    led.set_high().unwrap();
 }
 
 #[exception]
